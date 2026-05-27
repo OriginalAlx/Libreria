@@ -1,63 +1,64 @@
 package com.libreria.edex.security;
 
 import com.libreria.edex.service.CustomUserDetailsService;
+import com.libreria.edex.ui.Inicio;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-@EnableWebSecurity
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
 
-    private final CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+    private final Environment environment;
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
-        this.customUserDetailsService = customUserDetailsService;
+    public SecurityConfig(CustomUserDetailsService userDetailsService, Environment environment) {
+        this.userDetailsService = userDetailsService;
+        this.environment = environment;
     }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager() {
-        return new ProviderManager(authenticationProvider());
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().requestMatchers("/images/**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // Primero permitir acceso público a recursos estáticos y login
-        http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers("/login").permitAll();
-            auth.requestMatchers("/").permitAll();
-            auth.requestMatchers("/VAADIN/**", "/images/**", "/styles/**").permitAll();
-            auth.anyRequest().authenticated();
-        });
+        http.userDetailsService(userDetailsService);
 
-        // Deshabilitar el formLogin por defecto de Spring para usar nuestra vista Vaadin
-        http.formLogin().disable();
-        http.logout().disable();
-        
-        // Deshabilitar CSRF para simplificar
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/VAADIN/**"));
-        
-        // Configurar Vaadin Web Security sin interferir con nuestro login personalizado
+        if (isDevProfile()) {
+            http.authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll());
+            http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+        }
+
+        setLoginView(http, Inicio.class);
         super.configure(http);
+    }
+
+    private boolean isDevProfile() {
+        for (String profile : environment.getActiveProfiles()) {
+            if ("dev".equals(profile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+            throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }

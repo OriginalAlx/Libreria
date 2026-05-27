@@ -1,60 +1,72 @@
 package com.libreria.edex.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
-public class Usuario  implements UserDetailsService{
+@Table(name = "usuario")
+public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    private String username;    
-    private String email;      
-    private String password;   
-    private boolean activo;    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "rol_id", nullable = false)
+    private Rol rol;
 
-    @ManyToOne
-    private Rol rol;           
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
 
-    @OneToOne
-    private Cliente cliente;
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
 
-    public Usuario() {
-    }
+    @Column(nullable = false, length = 255)
+    private String password;
 
-    public Usuario(Integer id, String nombre, String email, String password, boolean activo, Rol rol, Cliente cliente) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.activo = activo;
-        this.rol = rol;
-        this.cliente = cliente;
-    }
-    
-    
-    public Integer getId() {
+    @Column(nullable = false)
+    private boolean activo = true;
+
+    @Column(name = "email_verificado", nullable = false)
+    private boolean emailVerificado = false;
+
+    @Column(name = "token_verificacion", length = 64)
+    private String tokenVerificacion;
+
+    @Column(name = "token_expiracion")
+    private LocalDateTime tokenExpiracion;
+
+    @Column(name = "token_reset_password", length = 64)
+    private String tokenResetPassword;
+
+    @Column(name = "token_reset_expiracion")
+    private LocalDateTime tokenResetExpiracion;
+
+    @Column(name = "fecha_registro", nullable = false)
+    private LocalDateTime fechaRegistro = LocalDateTime.now();
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getNombre() {
-        return username;
+    public Rol getRol() {
+        return rol;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 
     public String getEmail() {
@@ -63,6 +75,14 @@ public class Usuario  implements UserDetailsService{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -81,28 +101,51 @@ public class Usuario  implements UserDetailsService{
         this.activo = activo;
     }
 
-    public Rol getRol() {
-        return rol;
+    public boolean isEmailVerificado() {
+        return emailVerificado;
     }
 
-    public void setRol(Rol rol) {
-        this.rol = rol;
+    public void setEmailVerificado(boolean emailVerificado) {
+        this.emailVerificado = emailVerificado;
     }
 
-    public Cliente getCliente() {
-        return cliente;
+    public String getTokenVerificacion() {
+        return tokenVerificacion;
     }
 
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
+    public void setTokenVerificacion(String tokenVerificacion) {
+        this.tokenVerificacion = tokenVerificacion;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public LocalDateTime getTokenExpiracion() {
+        return tokenExpiracion;
     }
-    
-    
+
+    public void setTokenExpiracion(LocalDateTime tokenExpiracion) {
+        this.tokenExpiracion = tokenExpiracion;
+    }
+
+    public String getTokenResetPassword() {
+        return tokenResetPassword;
+    }
+
+    public void setTokenResetPassword(String tokenResetPassword) {
+        this.tokenResetPassword = tokenResetPassword;
+    }
+
+    public LocalDateTime getTokenResetExpiracion() {
+        return tokenResetExpiracion;
+    }
+
+    public void setTokenResetExpiracion(LocalDateTime tokenResetExpiracion) {
+        this.tokenResetExpiracion = tokenResetExpiracion;
+    }
+
+    public LocalDateTime getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(LocalDateTime fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
 }
-
-

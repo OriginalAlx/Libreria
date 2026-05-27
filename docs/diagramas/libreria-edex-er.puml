@@ -1,0 +1,226 @@
+@startuml LibreriaEdex_ER
+!theme plain
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam class {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  ArrowColor #334155
+}
+
+title Diagrama Entidad-Relación\nSistema de Gestión - Librería EDEX
+
+entity "rol" as rol {
+  * id : BIGINT <<PK>>
+  --
+  nombre : VARCHAR(20) <<UK>>
+  descripcion : VARCHAR(100)
+}
+
+entity "usuario" as usuario {
+  * id : BIGINT <<PK>>
+  --
+  # rol_id : BIGINT <<FK>>
+  username : VARCHAR(50) <<UK>>
+  password : VARCHAR(255)
+  email : VARCHAR(100) <<UK>>
+  activo : BOOLEAN
+  fecha_registro : DATETIME
+}
+
+entity "cliente" as cliente {
+  * id : BIGINT <<PK>>
+  --
+  # usuario_id : BIGINT <<FK>> <<nullable>>
+  nombre : VARCHAR(80)
+  apellido : VARCHAR(80)
+  dni : VARCHAR(15) <<UK>>
+  telefono : VARCHAR(30)
+  email : VARCHAR(100)
+  direccion : VARCHAR(200)
+}
+
+entity "categoria" as categoria {
+  * id : BIGINT <<PK>>
+  --
+  nombre : VARCHAR(80) <<UK>>
+  descripcion : VARCHAR(255)
+}
+
+entity "producto" as producto {
+  * id : BIGINT <<PK>>
+  --
+  # categoria_id : BIGINT <<FK>>
+  codigo : VARCHAR(30) <<UK>>
+  nombre : VARCHAR(150)
+  descripcion : TEXT
+  precio_compra : DECIMAL(10,2)
+  precio_venta : DECIMAL(10,2)
+  stock_actual : INT
+  stock_minimo : INT
+  stock_maximo : INT
+  activo : BOOLEAN
+}
+
+entity "proveedor" as proveedor {
+  * id : BIGINT <<PK>>
+  --
+  razon_social : VARCHAR(150)
+  cuit : VARCHAR(20)
+  telefono : VARCHAR(30)
+  email : VARCHAR(100)
+  direccion : VARCHAR(200)
+  contacto_nombre : VARCHAR(100)
+  activo : BOOLEAN
+}
+
+entity "compra" as compra {
+  * id : BIGINT <<PK>>
+  --
+  # proveedor_id : BIGINT <<FK>>
+  # usuario_id : BIGINT <<FK>>
+  fecha : DATE
+  numero_factura : VARCHAR(50)
+  total : DECIMAL(10,2)
+  estado : ENUM
+  fecha_entrega : DATE
+}
+
+entity "detalle_compra" as detalle_compra {
+  * id : BIGINT <<PK>>
+  --
+  # compra_id : BIGINT <<FK>>
+  # producto_id : BIGINT <<FK>>
+  cantidad : INT
+  precio_unitario : DECIMAL(10,2)
+  subtotal : DECIMAL(10,2)
+}
+
+entity "caja" as caja {
+  * id : BIGINT <<PK>>
+  --
+  # usuario_apertura_id : BIGINT <<FK>>
+  # usuario_cierre_id : BIGINT <<FK>> <<nullable>>
+  fecha_apertura : DATETIME
+  fecha_cierre : DATETIME
+  monto_inicial : DECIMAL(10,2)
+  monto_final : DECIMAL(10,2)
+  estado : ENUM
+}
+
+entity "venta" as venta {
+  * id : BIGINT <<PK>>
+  --
+  # cliente_id : BIGINT <<FK>>
+  # usuario_id : BIGINT <<FK>>
+  # caja_id : BIGINT <<FK>>
+  fecha : DATETIME
+  subtotal : DECIMAL(10,2)
+  descuento : DECIMAL(10,2)
+  total : DECIMAL(10,2)
+  metodo_pago : ENUM
+  estado : ENUM
+}
+
+entity "detalle_venta" as detalle_venta {
+  * id : BIGINT <<PK>>
+  --
+  # venta_id : BIGINT <<FK>>
+  # producto_id : BIGINT <<FK>>
+  cantidad : INT
+  precio_unitario : DECIMAL(10,2)
+  subtotal : DECIMAL(10,2)
+}
+
+entity "ticket" as ticket {
+  * id : BIGINT <<PK>>
+  --
+  # venta_id : BIGINT <<FK>> <<UK>>
+  numero_ticket : VARCHAR(30) <<UK>>
+  fecha_emision : DATETIME
+  contenido : TEXT
+}
+
+entity "movimiento_caja" as movimiento_caja {
+  * id : BIGINT <<PK>>
+  --
+  # caja_id : BIGINT <<FK>>
+  tipo : ENUM
+  monto : DECIMAL(10,2)
+  concepto : VARCHAR(200)
+  fecha : DATETIME
+  referencia_id : BIGINT
+}
+
+entity "movimiento_stock" as movimiento_stock {
+  * id : BIGINT <<PK>>
+  --
+  # producto_id : BIGINT <<FK>>
+  tipo : ENUM
+  cantidad : INT
+  stock_anterior : INT
+  stock_posterior : INT
+  fecha : DATETIME
+  referencia_id : BIGINT
+  observacion : VARCHAR(255)
+}
+
+entity "alerta_stock" as alerta_stock {
+  * id : BIGINT <<PK>>
+  --
+  # producto_id : BIGINT <<FK>>
+  stock_actual : INT
+  stock_minimo : INT
+  fecha_alerta : DATETIME
+  leida : BOOLEAN
+  resuelta : BOOLEAN
+}
+
+' --- Relaciones ---
+
+rol ||--o{ usuario : "tiene"
+usuario |o--o| cliente : "puede ser"
+categoria ||--o{ producto : "clasifica"
+
+proveedor ||--o{ compra : "suministra"
+usuario ||--o{ compra : "registra"
+compra ||--|{ detalle_compra : "contiene"
+producto ||--o{ detalle_compra : "incluye"
+
+cliente ||--o{ venta : "realiza"
+usuario ||--o{ venta : "registra"
+caja ||--o{ venta : "procesa"
+venta ||--|{ detalle_venta : "contiene"
+producto ||--o{ detalle_venta : "incluye"
+venta ||--|| ticket : "genera"
+
+usuario ||--o{ caja : "abre/cierra"
+caja ||--o{ movimiento_caja : "registra"
+
+producto ||--o{ movimiento_stock : "afecta"
+producto ||--o{ alerta_stock : "dispara"
+
+note bottom of producto
+  stock_minimo / stock_maximo
+  por tipo de producto
+  Alerta automática si stock <= mínimo
+end note
+
+note bottom of venta
+  metodo_pago: EFECTIVO | TRANSFERENCIA
+  estado: COMPLETADA | ANULADA
+end note
+
+note bottom of compra
+  estado: PENDIENTE | RECIBIDA | CANCELADA
+  Control de entregas y facturación
+end note
+
+note bottom of movimiento_stock
+  ENTRADA_COMPRA | SALIDA_VENTA
+  TRANSFERENCIA | AJUSTE
+end note
+
+@enduml

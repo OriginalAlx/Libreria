@@ -1,60 +1,59 @@
 package com.libreria.edex.model;
 
+import com.libreria.edex.model.enums.RolNombre;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.List;
 
 @Entity
 @Table(name = "rol")
 public class Rol {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String nombre; 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true, length = 20)
+    private RolNombre nombre;
+
+    @Column(length = 100)
+    private String descripcion;
 
     public Rol() {
     }
 
-    public Rol(Integer id, String nombre, List<Usuario> usuarios) {
-        this.id = id;
+    public Rol(RolNombre nombre, String descripcion) {
         this.nombre = nombre;
-        this.usuarios = usuarios;
+        this.descripcion = descripcion;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getNombre() {
+    public RolNombre getNombre() {
         return nombre;
     }
 
-    public void setNombre(String nombre) {
+    public void setNombre(RolNombre nombre) {
         this.nombre = nombre;
     }
 
-    public List<Usuario> getUsuarios() {
-        return usuarios;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setUsuarios(List<Usuario> usuarios) {
-        this.usuarios = usuarios;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
-    
-    
-    
-    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY) 
-    private List<Usuario> usuarios; 
 }

@@ -1,0 +1,18 @@
+# Conexión MySQL para NetBeans (Services > Databases > New Connection)
+#
+# Driver: MySQL (Connector/J 8.x)
+# Host: localhost
+# Port: 3306
+# Database: libreria_edex
+# User: root
+# Password: (tu contraseña MySQL)
+#
+# JDBC URL:
+# jdbc:mysql://localhost:3306/libreria_edex?serverTimezone=UTC&useSSL=false
+#
+# Crear la BD antes de conectar:
+#   ./database/setup-mysql.sh root
+#   mysql -u root -p < database/libreria_edex.sql
+#
+# Perfil Spring para MySQL en NetBeans:
+#   Project Properties > Run > Environment > spring.profiles.active=mysql

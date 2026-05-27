@@ -2,48 +2,58 @@ package com.libreria.edex.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-
 
 @Entity
 @Table(name = "cliente")
-
 public class Cliente {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
+
+    @Column(nullable = false, length = 80)
     private String nombre;
-    
+
+    @Column(nullable = false, length = 80)
+    private String apellido;
+
+    @Column(length = 15, unique = true)
+    private String dni;
+
+    @Column(length = 30)
     private String telefono;
+
+    @Column(length = 100)
     private String email;
+
+    @Column(length = 200)
     private String direccion;
 
-    @Column(nullable = false)
-    private LocalDate fechaAlta = LocalDate.now();
-
-    public Cliente() {
-    }
-
-    public Cliente(Integer id, String nombre, String telefono, String email, String direccion) {
-        this.id = id;
-        this.nombre = nombre;
-        this.telefono = telefono;
-        this.email = email;
-        this.direccion = direccion;
-    }
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public String getNombre() {
@@ -52,6 +62,22 @@ public class Cliente {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
     }
 
     public String getTelefono() {
@@ -77,17 +103,4 @@ public class Cliente {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-
-    public LocalDate getFechaAlta() {
-        return fechaAlta;
-    }
-
-    public void setFechaAlta(LocalDate fechaAlta) {
-        this.fechaAlta = fechaAlta;
-    }
-    
-    
-    
-    
 }
-
