@@ -94,7 +94,7 @@ public class CatalogoView extends VerticalLayout {
                                 .set("box-shadow", "0 4px 12px rgba(102, 126, 234, 0.3)")
                                 .set("padding", "20px 30px");
 
-                H1 titulo = new H1("🏪 LIBRERÍA EDEX");
+                H1 titulo = new H1("LIBRERÍA EDEX");
                 titulo.getStyle()
                                 .set("margin", "0")
                                 .set("flex-grow", "1")
@@ -373,50 +373,54 @@ public class CatalogoView extends VerticalLayout {
                                 .set("cursor", "pointer");
 
                 List<String> imagenes = producto.getUrlsImagenes();
-                if (imagenes != null && !imagenes.isEmpty()) {
-                        String imagenUrl = imagenes.get(0);
-                        if (!imagenUrl.startsWith("/") && !imagenUrl.startsWith("http")) {
-                                imagenUrl = "/" + imagenUrl;
-                        }
-                        Image img = new Image(imagenUrl, producto.getNombre());
-                        img.getStyle()
-                                        .set("width", "100%")
-                                        .set("height", "100%")
-                                        .set("object-fit", "cover")
-                                        .set("transition", "transform 0.3s ease");
-                        imagenContainer.add(img);
-
-                        if (imagenes.size() > 1) {
-                                Span badgeMultiples = new Span(imagenes.size() + " imágenes");
-                                badgeMultiples.getStyle()
-                                                .set("position", "absolute")
-                                                .set("bottom", "10px")
-                                                .set("left", "10px")
-                                                .set("background", "rgba(102, 126, 234, 0.9)")
-                                                .set("color", "white")
-                                                .set("padding", "6px 12px")
-                                                .set("border-radius", "20px")
-                                                .set("font-size", "12px")
-                                                .set("font-weight", "600")
-                                                .set("z-index", "10");
-                                imagenContainer.add(badgeMultiples);
+                boolean tieneImagenes = imagenes != null && !imagenes.isEmpty() && imagenes.stream().anyMatch(u -> u != null && !u.trim().isEmpty());
+                
+                if (tieneImagenes) {
+                        String imagenUrl = imagenes.get(0).trim();
+                        // Validar que la URL sea válida
+                        if (!imagenUrl.isEmpty()) {
+                                // Agregar "/" si no comienza con "/" o "http"
+                                if (!imagenUrl.startsWith("/") && !imagenUrl.startsWith("http")) {
+                                        imagenUrl = "/" + imagenUrl;
+                                }
+                                
+                                Image img = new Image(imagenUrl, producto.getNombre());
+                                img.getStyle()
+                                                .set("width", "100%")
+                                                .set("height", "100%")
+                                                .set("object-fit", "cover")
+                                                .set("transition", "transform 0.3s ease")
+                                                .set("display", "block");
+                                imagenContainer.add(img);
+                                
+                                // Badge de múltiples imágenes si existen
+                                List<String> imagenesValidas = imagenes.stream()
+                                        .filter(u -> u != null && !u.trim().isEmpty())
+                                        .collect(Collectors.toList());
+                                        
+                                if (imagenesValidas.size() > 1) {
+                                        Span badgeMultiples = new Span("📸 " + imagenesValidas.size() + " fotos");
+                                        badgeMultiples.getStyle()
+                                                        .set("position", "absolute")
+                                                        .set("bottom", "10px")
+                                                        .set("left", "10px")
+                                                        .set("background", "rgba(102, 126, 234, 0.95)")
+                                                        .set("color", "white")
+                                                        .set("padding", "6px 12px")
+                                                        .set("border-radius", "20px")
+                                                        .set("font-size", "12px")
+                                                        .set("font-weight", "600")
+                                                        .set("z-index", "10")
+                                                        .set("backdrop-filter", "blur(5px)");
+                                        imagenContainer.add(badgeMultiples);
+                                }
+                        } else {
+                                // URL vacía, mostrar placeholder
+                                crearPlaceholderImagen(imagenContainer);
                         }
                 } else {
-                        Div placeholderDiv = new Div();
-                        placeholderDiv.getStyle()
-                                        .set("width", "100%")
-                                        .set("height", "100%")
-                                        .set("display", "flex")
-                                        .set("align-items", "center")
-                                        .set("justify-content", "center");
-
-                        Icon icono = VaadinIcon.PACKAGE.create();
-                        icono.getStyle()
-                                        .set("color", "white")
-                                        .set("width", "60px")
-                                        .set("height", "60px");
-                        placeholderDiv.add(icono);
-                        imagenContainer.add(placeholderDiv);
+                        // Sin imágenes, mostrar placeholder
+                        crearPlaceholderImagen(imagenContainer);
                 }
 
                 // Badge de disponibilidad
@@ -505,5 +509,37 @@ public class CatalogoView extends VerticalLayout {
                 });
 
                 return tarjeta;
+        }
+
+        /**
+         * Crea un placeholder de imagen cuando no hay imagen disponible
+         */
+        private void crearPlaceholderImagen(Div imagenContainer) {
+                Div placeholderDiv = new Div();
+                placeholderDiv.getStyle()
+                                .set("width", "100%")
+                                .set("height", "100%")
+                                .set("display", "flex")
+                                .set("flex-direction", "column")
+                                .set("align-items", "center")
+                                .set("justify-content", "center")
+                                .set("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)");
+
+                Icon icono = VaadinIcon.PACKAGE.create();
+                icono.getStyle()
+                                .set("color", "white")
+                                .set("width", "60px")
+                                .set("height", "60px")
+                                .set("opacity", "0.8")
+                                .set("margin-bottom", "10px");
+
+                Span textoPlaceholder = new Span("Sin foto");
+                textoPlaceholder.getStyle()
+                                .set("color", "white")
+                                .set("font-size", "13px")
+                                .set("opacity", "0.7");
+
+                placeholderDiv.add(icono, textoPlaceholder);
+                imagenContainer.add(placeholderDiv);
         }
 }

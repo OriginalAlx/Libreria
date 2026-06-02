@@ -43,6 +43,42 @@ CREATE TABLE IF NOT EXISTS cliente (
     CONSTRAINT fk_cliente_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS producto(
+    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sku                 VARCHAR(50)  NOT NULL UNIQUE,
+    nombre              VARCHAR(150) NOT NULL,
+    descripcion         VARCHAR(500),
+    url_imagen          VARCHAR(500),
+    categoria           VARCHAR(100) NOT NULL,
+    precio              DECIMAL(10, 2) NOT NULL,
+    cost_compra         DECIMAL(10, 2) NOT NULL,
+    stock_actual        INT NOT NULL DEFAULT 0,
+    stock_minimo        INT NOT NULL DEFAULT 5,
+    stock_maximo        INT NOT NULL DEFAULT 100,
+    proveedor           VARCHAR(100),
+    disponible          TINYINT(1) NOT NULL DEFAULT 1,
+    fecha_creacion      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_categoria (categoria),
+    INDEX idx_disponible (disponible),
+    INDEX idx_sku (sku)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabla para múltiples imágenes por producto
+CREATE TABLE IF NOT EXISTS producto_imagen (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    producto_id     BIGINT NOT NULL,
+    url             VARCHAR(500) NOT NULL,
+    orden           INT NOT NULL DEFAULT 1,
+    principal       TINYINT(1) NOT NULL DEFAULT 0,
+    descripcion     VARCHAR(200),
+    fecha_creacion  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_producto_imagen FOREIGN KEY (producto_id) REFERENCES producto(id) ON DELETE CASCADE,
+    INDEX idx_producto (producto_id),
+    INDEX idx_orden (orden),
+    UNIQUE KEY uq_producto_url (producto_id, url)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 INSERT IGNORE INTO rol (nombre, descripcion) VALUES
     ('ADMIN',    'Administrador del sistema'),
     ('EMPLEADO', 'Empleado / vendedor'),

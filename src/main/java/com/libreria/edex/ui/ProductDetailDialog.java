@@ -4,11 +4,13 @@ import com.libreria.edex.model.Producto;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -25,7 +27,11 @@ public class ProductDetailDialog extends Dialog {
 
     public ProductDetailDialog(Producto producto) {
         this.producto = producto;
-        this.imagenes = producto.getUrlsImagenes();
+        // Obtener imágenes y filtrar las vacías
+        List<String> imagenesBD = producto.getUrlsImagenes();
+        this.imagenes = imagenesBD.stream()
+                .filter(url -> url != null && !url.trim().isEmpty())
+                .collect(java.util.stream.Collectors.toList());
 
         setWidth("600px");
         setHeight("auto");
@@ -74,21 +80,50 @@ public class ProductDetailDialog extends Dialog {
                 .set("border-radius", "8px")
                 .set("min-height", "300px");
 
-        imagenPrincipal = new Image();
-        imagenPrincipal.setWidth("100%");
-        imagenPrincipal.setHeight("100%");
-        imagenPrincipal.getStyle()
-                .set("object-fit", "contain")
-                .set("max-width", "500px")
-                .set("max-height", "300px");
+        if (imagenes != null && !imagenes.isEmpty()) {
+                imagenPrincipal = new Image();
+                imagenPrincipal.setWidth("100%");
+                imagenPrincipal.setHeight("100%");
+                imagenPrincipal.getStyle()
+                        .set("object-fit", "contain")
+                        .set("max-width", "500px")
+                        .set("max-height", "300px")
+                        .set("display", "block");
 
-        actualizarImagen();
-        contenedorImagen.add(imagenPrincipal);
-        seccion.add(contenedorImagen);
+                actualizarImagen();
+                contenedorImagen.add(imagenPrincipal);
+                seccion.add(contenedorImagen);
 
-        // Controles de navegación
-        if (imagenes.size() > 1) {
-            seccion.add(crearControlesNavegacion());
+                // Controles de navegación solo si hay más de una imagen
+                if (imagenes.size() > 1) {
+                        seccion.add(crearControlesNavegacion());
+                }
+        } else {
+                // Mostrar placeholder cuando no hay imágenes
+                Div placeholderDiv = new Div();
+                placeholderDiv.getStyle()
+                        .set("width", "100%")
+                        .set("height", "300px")
+                        .set("display", "flex")
+                        .set("flex-direction", "column")
+                        .set("align-items", "center")
+                        .set("justify-content", "center");
+
+                Icon icono = VaadinIcon.PACKAGE.create();
+                icono.getStyle()
+                        .set("color", "#ddd")
+                        .set("width", "80px")
+                        .set("height", "80px")
+                        .set("margin-bottom", "15px");
+
+                Span textoPlaceholder = new Span("No hay imágenes disponibles");
+                textoPlaceholder.getStyle()
+                        .set("color", "#999")
+                        .set("font-size", "14px");
+
+                placeholderDiv.add(icono, textoPlaceholder);
+                contenedorImagen.add(placeholderDiv);
+                seccion.add(contenedorImagen);
         }
 
         return seccion;
@@ -196,26 +231,35 @@ public class ProductDetailDialog extends Dialog {
     }
 
     private void imagenAnterior() {
-        indiceImagenActual = (indiceImagenActual - 1 + imagenes.size()) % imagenes.size();
-        actualizarImagen();
+        if (imagenes != null && imagenes.size() > 0) {
+            indiceImagenActual = (indiceImagenActual - 1 + imagenes.size()) % imagenes.size();
+            actualizarImagen();
+        }
     }
 
     private void imagenSiguiente() {
-        indiceImagenActual = (indiceImagenActual + 1) % imagenes.size();
-        actualizarImagen();
+        if (imagenes != null && imagenes.size() > 0) {
+            indiceImagenActual = (indiceImagenActual + 1) % imagenes.size();
+            actualizarImagen();
+        }
     }
 
     private void actualizarImagen() {
-        if (imagenes != null && !imagenes.isEmpty()) {
+        if (imagenPrincipal != null && imagenes != null && !imagenes.isEmpty()) {
             String url = imagenes.get(indiceImagenActual);
-            if (!url.startsWith("/") && !url.startsWith("http")) {
-                url = "/" + url;
-            }
-            imagenPrincipal.setSrc(url);
-            imagenPrincipal.setAlt(producto.getNombre() + " - Imagen " + (indiceImagenActual + 1));
+            // Validar que la URL sea válida
+            if (url != null && !url.trim().isEmpty()) {
+                url = url.trim();
+                // Agregar "/" si no comienza con "/" o "http"
+                if (!url.startsWith("/") && !url.startsWith("http")) {
+                    url = "/" + url;
+                }
+                imagenPrincipal.setSrc(url);
+                imagenPrincipal.setAlt(producto.getNombre() + " - Imagen " + (indiceImagenActual + 1));
 
-            if (indicadorPagina != null) {
-                indicadorPagina.setText((indiceImagenActual + 1) + " de " + imagenes.size());
+                if (indicadorPagina != null) {
+                    indicadorPagina.setText((indiceImagenActual + 1) + " de " + imagenes.size());
+                }
             }
         }
     }

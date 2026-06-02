@@ -88,11 +88,10 @@ public class Inicio extends VerticalLayout implements BeforeEnterObserver {
                 .set("border", "1px solid rgba(224,224,224,0.6)")
                 .set("border-radius", "16px")
                 .set("padding", "30px")
-                .set("box-shadow", "0 8px 24px rgba(0,0,0,0.25)") 
                 .set("box-shadow", "0 4px 12px rgba(0,0,0,0.15), 0 12px 24px rgba(0,0,0,0.25)")
                 .set("background-color", "#ffffff")
                 .set("max-width", "400px")
-                .set("width", "150%");
+                .set("width", "100%");
 
         add(formulario);
     }
@@ -149,7 +148,7 @@ public class Inicio extends VerticalLayout implements BeforeEnterObserver {
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         }
         if (event.getLocation().getQueryParameters().getParameters().containsKey("passwordReset")) {
-            Notification.show("Contraseña actualizada. Ya podés iniciar sesión.", 5000, Notification.Position.TOP_CENTER)
+            Notification.show("Contraseña actualizada", 5000, Notification.Position.TOP_CENTER)
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         }
     }

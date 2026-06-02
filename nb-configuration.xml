@@ -4,9 +4,10 @@
     <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
         <org-netbeans-modules-maven-j2ee.netbeans_2e_hint_2e_deploy_2e_server>SpringBoot</org-netbeans-modules-maven-j2ee.netbeans_2e_hint_2e_deploy_2e_server>
         <org-netbeans-modules-maven-j2ee.netbeans_2e_hint_2e_j2eeVersion>8.0</org-netbeans-modules-maven-j2ee.netbeans_2e_hint_2e_j2eeVersion>
-        <netbeans.hint.jdkPlatform>JDK_21</netbeans.hint.jdkPlatform>
+        <netbeans.hint.jdkPlatform>JDK_21__System_</netbeans.hint.jdkPlatform>
         <exec.mainClass>com.libreria.edex.LibreriaEdexApplication</exec.mainClass>
         <spring-boot.run.main-class>com.libreria.edex.LibreriaEdexApplication</spring-boot.run.main-class>
         <run.jvmArguments>-Dspring.profiles.active=dev</run.jvmArguments>
+        <org-netbeans-modules-javascript2-requirejs.enabled>true</org-netbeans-modules-javascript2-requirejs.enabled>
     </properties>
 </project-shared-configuration>

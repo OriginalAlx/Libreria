@@ -28,4 +28,16 @@ public interface ProductoRepository extends JpaRepository<Producto, Long>{
     List<Producto> findByCategoriaAndPrecioBetweenAndDisponible(
             String categoria, Double min, Double max, boolean disponible
     );
+    
+    // Buscar por nombre (parcial)
+    List<Producto> findByNombreContainingIgnoreCase(String nombre);
+    
+    // Buscar productos disponibles
+    List<Producto> findByDisponibleTrue();
+    
+    // Buscar por proveedor
+    List<Producto> findByProveedor(String proveedor);
+    
+    // Buscar por SKU
+    Producto findBySku(String sku);
 }

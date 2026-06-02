@@ -1,40 +1,95 @@
 package com.libreria.edex.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "productos")
+@Table(name = "producto")
 public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true, length = 50)
+    private String sku;
+
+    @Column(nullable = false, length = 150)
     private String nombre;
 
+    @Column(length = 500)
+    private String descripcion;
+
+    @Column(name = "url_imagen", length = 500)
+    private String urlImagen;
+
+    @Column(nullable = false)
     private String categoria;
 
+    @Column(nullable = false)
     private Double precio;
 
+    @Column(nullable = false)
+    private Double costCompra;
+
+    @Column(name = "stock_actual", nullable = false)
+    private Integer stockActual;
+
+    @Column(name = "stock_minimo", nullable = false)
+    private Integer stockMinimo;
+
+    @Column(name = "stock_maximo", nullable = false)
+    private Integer stockMaximo;
+
+    @Column(length = 100)
+    private String proveedor;
+
+    @Column(nullable = false)
     private boolean disponible;
 
-    // Constructor vacío
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
+    private LocalDateTime fechaCreacion = LocalDateTime.now();
+
+    @Column(name = "fecha_actualizacion")
+    private LocalDateTime fechaActualizacion = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<ProductoImagen> imagenes = new ArrayList<>();
+
     public Producto() {
     }
 
-    // Constructor con parámetros
-    public Producto(String nombre, String categoria, Double precio, boolean disponible) {
+    public Producto(Long id, String sku, String nombre, String descripcion, String urlImagen, String categoria,
+            Double precio, Double costCompra, Integer stockActual, Integer stockMinimo, Integer stockMaximo,
+            String proveedor, boolean disponible, LocalDateTime fechaCreacion, LocalDateTime fechaActualizacion) {
+        this.id = id;
+        this.sku = sku;
         this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.urlImagen = urlImagen;
         this.categoria = categoria;
         this.precio = precio;
+        this.costCompra = costCompra;
+        this.stockActual = stockActual;
+        this.stockMinimo = stockMinimo;
+        this.stockMaximo = stockMaximo;
+        this.proveedor = proveedor;
         this.disponible = disponible;
+        this.fechaCreacion = fechaCreacion;
+        this.fechaActualizacion = fechaActualizacion;
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -43,12 +98,36 @@ public class Producto {
         this.id = id;
     }
 
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
     public String getNombre() {
         return nombre;
     }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getUrlImagen() {
+        return urlImagen;
+    }
+
+    public void setUrlImagen(String urlImagen) {
+        this.urlImagen = urlImagen;
     }
 
     public String getCategoria() {
@@ -67,11 +146,125 @@ public class Producto {
         this.precio = precio;
     }
 
+    public Double getCostCompra() {
+        return costCompra;
+    }
+
+    public void setCostCompra(Double costCompra) {
+        this.costCompra = costCompra;
+    }
+
+    public Integer getStockActual() {
+        return stockActual;
+    }
+
+    public void setStockActual(Integer stockActual) {
+        this.stockActual = stockActual;
+    }
+
+    public Integer getStockMinimo() {
+        return stockMinimo;
+    }
+
+    public void setStockMinimo(Integer stockMinimo) {
+        this.stockMinimo = stockMinimo;
+    }
+
+    public Integer getStockMaximo() {
+        return stockMaximo;
+    }
+
+    public void setStockMaximo(Integer stockMaximo) {
+        this.stockMaximo = stockMaximo;
+    }
+
+    public String getProveedor() {
+        return proveedor;
+    }
+
+    public void setProveedor(String proveedor) {
+        this.proveedor = proveedor;
+    }
+
     public boolean isDisponible() {
         return disponible;
     }
 
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public LocalDateTime getFechaActualizacion() {
+        return fechaActualizacion;
+    }
+
+    public void setFechaActualizacion(LocalDateTime fechaActualizacion) {
+        this.fechaActualizacion = fechaActualizacion;
+    }
+
+    /**
+     * Obtiene una lista de URLs de imágenes ordenadas por número de orden.
+     * Primero retorna la imagen principal si existe, luego el resto en orden.
+     * También mantiene compatibilidad con urlImagen si es necesario.
+     * 
+     * @return Lista de URLs de imágenes ordenadas
+     */
+    public List<String> getUrlsImagenes() {
+        // Si hay imágenes en la relación, usarlas (orden de BD)
+        if (imagenes != null && !imagenes.isEmpty()) {
+            return imagenes.stream()
+                    .filter(img -> img.getUrl() != null && !img.getUrl().trim().isEmpty())
+                    .sorted((a, b) -> {
+                        // Primero imagen principal
+                        if (a.isPrincipal() != b.isPrincipal()) {
+                            return a.isPrincipal() ? -1 : 1;
+                        }
+                        // Luego por orden
+                        return a.getOrden().compareTo(b.getOrden());
+                    })
+                    .map(ProductoImagen::getUrl)
+                    .collect(Collectors.toList());
+        }
+        
+        // Fallback: si existe urlImagen (para retrocompatibilidad)
+        // parsea URLs separadas por punto y coma
+        if (urlImagen != null && !urlImagen.trim().isEmpty()) {
+            return java.util.Arrays.stream(urlImagen.split(";"))
+                    .map(String::trim)
+                    .filter(url -> !url.isEmpty())
+                    .collect(Collectors.toList());
+        }
+        
+        return List.of();
+    }
+
+    public List<ProductoImagen> getImagenes() {
+        return imagenes;
+    }
+
+    public void setImagenes(List<ProductoImagen> imagenes) {
+        this.imagenes = imagenes;
+    }
+
+    public void addImagen(ProductoImagen imagen) {
+        if (imagenes == null) {
+            imagenes = new ArrayList<>();
+        }
+        imagen.setProducto(this);
+        imagenes.add(imagen);
+    }
+
+    public void removeImagen(ProductoImagen imagen) {
+        if (imagenes != null) {
+            imagenes.remove(imagen);
+        }
     }
 }
