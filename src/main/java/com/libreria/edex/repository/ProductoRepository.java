@@ -7,6 +7,7 @@ package com.libreria.edex.repository;
 import com.libreria.edex.model.Producto;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -40,4 +41,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Long>{
     
     // Buscar por SKU
     Producto findBySku(String sku);
+    
+    // Obtener categorías únicas
+    @Query("SELECT DISTINCT p.categoria FROM Producto p ORDER BY p.categoria")
+    List<String> findDistinctCategorias();
 }

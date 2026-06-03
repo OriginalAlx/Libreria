@@ -66,4 +66,12 @@ public class ProductoService {
     public void delete(Long id) {
         productoRepository.deleteById(id);
     }
+
+    /**
+     * Obtiene todas las categorías únicas de productos
+     * @return Lista de categorías ordenadas alfabéticamente
+     */
+    public List<String> findDistinctCategorias() {
+        return productoRepository.findDistinctCategorias();
+    }
 }

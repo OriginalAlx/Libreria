@@ -2,18 +2,30 @@
 # Compiled Java classes
 *.class
 
-# Maven/Gradle build directory
+# Maven/Gradle build artifacts
 target/
+build/
+
+# Dependencies
+lib/
+libs/
 
 # IDE files
 .idea/
 .vscode/
+*.iml
+*.ipr
+*.iws
 
 # Logs
 *.log
 
-# Environment files
+# Environment
 .env
 .env.local
 *.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db
 ```

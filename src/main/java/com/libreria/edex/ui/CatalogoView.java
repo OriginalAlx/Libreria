@@ -163,19 +163,13 @@ public class CatalogoView extends VerticalLayout {
                                 .set("margin-bottom", "15px");
                 busquedaField.addValueChangeListener(e -> aplicarFiltros());
 
-                // Filtro por categoría
+                // Filtro por categoría - Cargar categorías desde la base de datos
                 categoriaFilter = new ComboBox<>("Categoría");
                 categoriaFilter.setPlaceholder("Seleccionar categoría");
                 categoriaFilter.setWidthFull();
-                categoriaFilter.setItems(
-                                "Papelería",
-                                "Escritura",
-                                "Arte y dibujo",
-                                "Organización",
-                                "Accesorios",
-                                "Tecnología",
-                                "Mochilas y estuches",
-                                "Oficina y escritorio");
+                // Cargar categorías dinámicamente desde la BD
+                List<String> categorias = productoService.findDistinctCategorias();
+                categoriaFilter.setItems(categorias);
                 categoriaFilter.getStyle()
                                 .set("margin-bottom", "20px");
                 categoriaFilter.addValueChangeListener(e -> aplicarFiltros());
