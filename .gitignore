@@ -1,37 +1,19 @@
-# Compiled and build artifacts
+```
+# Compiled Java classes
 *.class
-*.o
-*.obj
-*.out
-build/
+
+# Maven/Gradle build directory
 target/
 
-# Dependencies
-.gradle/
-lib/
-
-# Logs and temp files
-*.log
-*.tmp
-
-# Editors
-.vscode/
+# IDE files
 .idea/
+.vscode/
 
-# Environment
+# Logs
+*.log
+
+# Environment files
 .env
 .env.local
 *.env.*
-src/main/resources/application-local.properties
-
-# Backup files
-*~
-*.bak
-*.swp
-
-# OS specific
-.DS_Store
-Thumbs.db
-
-# Project specific
-nbactions.xml
+```

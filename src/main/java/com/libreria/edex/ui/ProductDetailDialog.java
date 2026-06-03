@@ -24,6 +24,7 @@ public class ProductDetailDialog extends Dialog {
     private int indiceImagenActual = 0;
     private Image imagenPrincipal;
     private Span indicadorPagina;
+    private Div contenedorIndicadores;
 
     public ProductDetailDialog(Producto producto) {
         this.producto = producto;
@@ -33,11 +34,12 @@ public class ProductDetailDialog extends Dialog {
                 .filter(url -> url != null && !url.trim().isEmpty())
                 .collect(java.util.stream.Collectors.toList());
 
-        setWidth("600px");
+        setWidth("700px");
         setHeight("auto");
         setModal(true);
         setDraggable(true);
         setResizable(true);
+        addClassName("product-detail-dialog");
 
         add(crearContenido());
     }
@@ -67,9 +69,9 @@ public class ProductDetailDialog extends Dialog {
                 .set("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
                 .set("border-radius", "8px")
                 .set("padding", "20px")
-                .set("min-height", "300px");
+                .set("min-height", "350px");
 
-        // Contenedor de imagen
+        // Contenedor de imagen principal
         HorizontalLayout contenedorImagen = new HorizontalLayout();
         contenedorImagen.setWidthFull();
         contenedorImagen.setHeightFull();
@@ -78,7 +80,7 @@ public class ProductDetailDialog extends Dialog {
         contenedorImagen.getStyle()
                 .set("background", "white")
                 .set("border-radius", "8px")
-                .set("min-height", "300px");
+                .set("min-height", "350px");
 
         if (imagenes != null && !imagenes.isEmpty()) {
                 imagenPrincipal = new Image();
@@ -86,8 +88,8 @@ public class ProductDetailDialog extends Dialog {
                 imagenPrincipal.setHeight("100%");
                 imagenPrincipal.getStyle()
                         .set("object-fit", "contain")
-                        .set("max-width", "500px")
-                        .set("max-height", "300px")
+                        .set("max-width", "600px")
+                        .set("max-height", "350px")
                         .set("display", "block");
 
                 actualizarImagen();
@@ -97,13 +99,14 @@ public class ProductDetailDialog extends Dialog {
                 // Controles de navegación solo si hay más de una imagen
                 if (imagenes.size() > 1) {
                         seccion.add(crearControlesNavegacion());
+                        seccion.add(crearIndicadores());
                 }
         } else {
                 // Mostrar placeholder cuando no hay imágenes
                 Div placeholderDiv = new Div();
                 placeholderDiv.getStyle()
                         .set("width", "100%")
-                        .set("height", "300px")
+                        .set("height", "350px")
                         .set("display", "flex")
                         .set("flex-direction", "column")
                         .set("align-items", "center")
@@ -134,22 +137,57 @@ public class ProductDetailDialog extends Dialog {
         controles.setWidthFull();
         controles.setAlignItems(FlexComponent.Alignment.CENTER);
         controles.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        controles.getStyle().set("margin-top", "15px");
 
         Button btnAnterior = new Button(VaadinIcon.CHEVRON_LEFT.create(), e -> imagenAnterior());
-        btnAnterior.addThemeVariants(ButtonVariant.LUMO_ICON);
-        btnAnterior.getStyle().set("margin-right", "auto");
+        btnAnterior.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnAnterior.getStyle().set("background", "white").set("color", "#667eea");
 
         indicadorPagina = new Span((indiceImagenActual + 1) + " de " + imagenes.size());
         indicadorPagina.getStyle()
                 .set("font-weight", "600")
-                .set("color", "#667eea");
+                .set("color", "white")
+                .set("font-size", "14px");
 
         Button btnSiguiente = new Button(VaadinIcon.CHEVRON_RIGHT.create(), e -> imagenSiguiente());
-        btnSiguiente.addThemeVariants(ButtonVariant.LUMO_ICON);
-        btnSiguiente.getStyle().set("margin-left", "auto");
+        btnSiguiente.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnSiguiente.getStyle().set("background", "white").set("color", "#667eea");
 
         controles.add(btnAnterior, indicadorPagina, btnSiguiente);
         return controles;
+    }
+
+    /**
+     * Crea los indicadores (puntos) para navegar entre las imágenes
+     */
+    private Div crearIndicadores() {
+        contenedorIndicadores = new Div();
+        contenedorIndicadores.getStyle()
+                .set("display", "flex")
+                .set("justify-content", "center")
+                .set("gap", "8px")
+                .set("margin-top", "12px");
+
+        for (int i = 0; i < imagenes.size(); i++) {
+            Div indicador = new Div();
+            indicador.getStyle()
+                    .set("width", "10px")
+                    .set("height", "10px")
+                    .set("border-radius", "50%")
+                    .set("background-color", i == 0 ? "white" : "rgba(255, 255, 255, 0.5)")
+                    .set("cursor", "pointer")
+                    .set("transition", "all 0.3s ease");
+
+            final int index = i;
+            indicador.getElement().addEventListener("click", e -> {
+                indiceImagenActual = index;
+                actualizarImagen();
+            });
+
+            contenedorIndicadores.add(indicador);
+        }
+
+        return contenedorIndicadores;
     }
 
     private VerticalLayout crearSeccionInfo() {
@@ -259,6 +297,25 @@ public class ProductDetailDialog extends Dialog {
 
                 if (indicadorPagina != null) {
                     indicadorPagina.setText((indiceImagenActual + 1) + " de " + imagenes.size());
+                }
+                
+                // Actualizar indicadores (puntos)
+                actualizarIndicadores();
+            }
+        }
+    }
+    
+    /**
+     * Actualiza el estilo visual de los indicadores según la imagen actual
+     */
+    private void actualizarIndicadores() {
+        if (contenedorIndicadores != null) {
+            for (int i = 0; i < contenedorIndicadores.getComponentCount(); i++) {
+                Div indicador = (Div) contenedorIndicadores.getComponentAt(i);
+                if (i == indiceImagenActual) {
+                    indicador.getStyle().set("background-color", "white");
+                } else {
+                    indicador.getStyle().set("background-color", "rgba(255, 255, 255, 0.5)");
                 }
             }
         }

@@ -262,3 +262,74 @@
 .rounded {
     border-radius: var(--border-radius);
 }
+
+/* Product Detail Dialog Styles */
+.product-detail-dialog .vaadin-dialog-overlay {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-detail-dialog-image-container {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 8px;
+}
+
+.product-detail-dialog-image {
+    max-width: 600px;
+    max-height: 350px;
+    object-fit: contain;
+    display: block;
+}
+
+.product-detail-dialog-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+    gap: 15px;
+}
+
+.product-detail-dialog-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.product-detail-dialog-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.product-detail-dialog-indicator.active {
+    background-color: white;
+}
+
+.product-detail-dialog-nav-btn {
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.product-detail-dialog-nav-btn:hover {
+    background: #f0f2ff;
+    transform: scale(1.1);
+}
