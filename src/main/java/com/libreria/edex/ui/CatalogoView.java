@@ -53,32 +53,26 @@ public class CatalogoView extends VerticalLayout {
                 this.securityService = securityService;
                 this.productoService = productoService;
 
-                // Configuración general
                 setSizeFull();
                 setPadding(false);
                 setSpacing(false);
                 getStyle().set("background-color", "#f7f7f7");
 
-                // Header
                 add(crearHeader());
 
-                // Contenido principal
                 HorizontalLayout mainContent = new HorizontalLayout();
                 mainContent.setWidthFull();
                 mainContent.setSpacing(false);
                 mainContent.setPadding(false);
 
-                // Sidebar de filtros
                 mainContent.add(crearSidebarFiltros());
 
-                // Área de productos
                 VerticalLayout areaProductos = crearAreaProductos();
                 mainContent.add(areaProductos);
                 mainContent.setFlexGrow(1, areaProductos);
 
                 add(mainContent);
 
-                // Cargar productos
                 cargarProductos();
         }
 
