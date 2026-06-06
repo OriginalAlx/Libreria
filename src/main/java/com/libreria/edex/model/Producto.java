@@ -1,18 +1,15 @@
 package com.libreria.edex.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "producto")
@@ -63,9 +60,6 @@ public class Producto {
 
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion = LocalDateTime.now();
-
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private List<ProductoImagen> imagenes = new ArrayList<>();
 
     public Producto() {
     }
@@ -211,60 +205,18 @@ public class Producto {
     }
 
     /**
-     * Obtiene una lista de URLs de imágenes ordenadas por número de orden.
-     * Primero retorna la imagen principal si existe, luego el resto en orden.
-     * También mantiene compatibilidad con urlImagen si es necesario.
+     * Obtiene una lista de URLs de imágenes almacenadas en el campo urlImagen.
+     * Las URLs pueden estar separadas por punto y coma.
      * 
-     * @return Lista de URLs de imágenes ordenadas
+     * @return Lista de URLs de imágenes
      */
     public List<String> getUrlsImagenes() {
-        // Si hay imágenes en la relación, usarlas (orden de BD)
-        if (imagenes != null && !imagenes.isEmpty()) {
-            return imagenes.stream()
-                    .filter(img -> img.getUrl() != null && !img.getUrl().trim().isEmpty())
-                    .sorted((a, b) -> {
-                        // Primero imagen principal
-                        if (a.isPrincipal() != b.isPrincipal()) {
-                            return a.isPrincipal() ? -1 : 1;
-                        }
-                        // Luego por orden
-                        return a.getOrden().compareTo(b.getOrden());
-                    })
-                    .map(ProductoImagen::getUrl)
-                    .collect(Collectors.toList());
-        }
-        
-        // Fallback: si existe urlImagen (para retrocompatibilidad)
-        // parsea URLs separadas por punto y coma
         if (urlImagen != null && !urlImagen.trim().isEmpty()) {
-            return java.util.Arrays.stream(urlImagen.split(";"))
+            return Arrays.stream(urlImagen.split(";"))
                     .map(String::trim)
                     .filter(url -> !url.isEmpty())
-                    .collect(Collectors.toList());
+                    .toList();
         }
-        
-        return List.of();
-    }
-
-    public List<ProductoImagen> getImagenes() {
-        return imagenes;
-    }
-
-    public void setImagenes(List<ProductoImagen> imagenes) {
-        this.imagenes = imagenes;
-    }
-
-    public void addImagen(ProductoImagen imagen) {
-        if (imagenes == null) {
-            imagenes = new ArrayList<>();
-        }
-        imagen.setProducto(this);
-        imagenes.add(imagen);
-    }
-
-    public void removeImagen(ProductoImagen imagen) {
-        if (imagenes != null) {
-            imagenes.remove(imagen);
-        }
+        return new ArrayList<>();
     }
 }

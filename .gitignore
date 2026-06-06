@@ -1,37 +1,43 @@
-# Compiled and build artifacts
+```
+# Compiled and binary files
 *.class
 *.o
 *.obj
+*.exe
+*.dll
+*.so
+*.a
 *.out
-build/
-target/
 
 # Dependencies
-.gradle/
 lib/
+target/
+.gradle/
 
 # Logs and temp files
 *.log
 *.tmp
-
-# Editors
-.vscode/
-.idea/
+*.swp
 
 # Environment
 .env
 .env.local
 *.env.*
-src/main/resources/application-local.properties
 
-# Backup files
-*~
-*.bak
-*.swp
+# Editors
+.vscode/
+.idea/
 
 # OS specific
 .DS_Store
 Thumbs.db
 
-# Project specific
-nbactions.xml
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Build artifacts
+dist/
+build/
+```
