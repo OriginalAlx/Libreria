@@ -41,7 +41,7 @@ public class Inicio extends VerticalLayout implements BeforeEnterObserver {
         setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
         getStyle()
-                .set("background-image", "url('images/fondo-libreriaedex.png')")
+                .set("background-image", "url('http://localhost:8081/images/fondo-libreriaedex.png')")
                 .set("background-size", "cover")
                 .set("background-position", "center")
                 .set("background-repeat", "no-repeat");

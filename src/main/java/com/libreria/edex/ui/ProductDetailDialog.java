@@ -250,9 +250,14 @@ public class ProductDetailDialog extends Dialog {
             // Validar que la URL sea válida
             if (url != null && !url.trim().isEmpty()) {
                 url = url.trim();
-                // Agregar "/" si no comienza con "/" o "http"
-                if (!url.startsWith("/") && !url.startsWith("http")) {
-                    url = "/" + url;
+                // Convertir ruta relativa a absoluta usando URL completa del servidor
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    // Remover slash inicial si existe
+                    if (url.startsWith("/")) {
+                        url = url.substring(1);
+                    }
+                    // Usar URL absoluta del servidor local
+                    url = "http://localhost:8081/" + url;
                 }
                 imagenPrincipal.setSrc(url);
                 imagenPrincipal.setAlt(producto.getNombre() + " - Imagen " + (indiceImagenActual + 1));

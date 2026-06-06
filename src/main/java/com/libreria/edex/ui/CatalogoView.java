@@ -373,9 +373,14 @@ public class CatalogoView extends VerticalLayout {
                         String imagenUrl = imagenes.get(0).trim();
                         // Validar que la URL sea válida
                         if (!imagenUrl.isEmpty()) {
-                                // Agregar "/" si no comienza con "/" o "http"
-                                if (!imagenUrl.startsWith("/") && !imagenUrl.startsWith("http")) {
-                                        imagenUrl = "/" + imagenUrl;
+                                // Convertir ruta relativa a absoluta usando CDN público
+                                if (!imagenUrl.startsWith("http://") && !imagenUrl.startsWith("https://")) {
+                                        // Remover slash inicial si existe
+                                        if (imagenUrl.startsWith("/")) {
+                                                imagenUrl = imagenUrl.substring(1);
+                                        }
+                                        // Usar URL absoluta del servidor local
+                                        imagenUrl = "http://localhost:8081/" + imagenUrl;
                                 }
                                 
                                 Image img = new Image(imagenUrl, producto.getNombre());
