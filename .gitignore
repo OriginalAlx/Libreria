@@ -1,37 +1,48 @@
+```
 # Compiled and build artifacts
+*.pyc
+__pycache__/
 *.class
 *.o
 *.obj
 *.out
+dist/
 build/
 target/
 
 # Dependencies
-.gradle/
-lib/
+node_modules/
+venv/
+.venv/
+.env
+.env.local
+*.env.*
 
 # Logs and temp files
 *.log
 *.tmp
+*.swp
+*.swo
 
 # Editors
 .vscode/
 .idea/
 
-# Environment
-.env
-.env.local
-*.env.*
-src/main/resources/application-local.properties
-
-# Backup files
-*~
-*.bak
-*.swp
-
-# OS specific
+# System files
 .DS_Store
 Thumbs.db
 
-# Project specific
-nbactions.xml
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Gradle
+.gradle/
+
+# MyPy
+.mypy_cache/
+
+# Pytest
+.pytest_cache/
+```
